@@ -577,8 +577,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
     if(max>0){var k=0.5/max; for(var j=0;j<n;j++) ch[j]*=k;}                // volumen contenido, sin saturar
     return buf;
   }
-  $("escena").addEventListener("click",function(){
-    if(sonando) return;
+  function purrSintetico(){
     try{
       var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return; actx=actx||new AC();
       var tocar=function(){
@@ -588,6 +587,23 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
       };
       if(actx.state==="suspended") actx.resume().then(tocar,function(){}); else tocar();
     }catch(e){sonando=false}
+  }
+  // ronroneo grabado; si el archivo no está, se usa el fabricado
+  var purrEl=null, purrFalla=false;
+  try{ purrEl=new Audio("ronroneo.mp3"); purrEl.preload="auto";
+    purrEl.addEventListener("error",function(){purrFalla=true});
+    purrEl.addEventListener("ended",function(){sonando=false});
+  }catch(e){purrFalla=true}
+  $("escena").addEventListener("click",function(){
+    if(sonando) return;
+    if(purrEl && !purrFalla){
+      sonando=true;
+      try{ purrEl.currentTime=0; }catch(e){}
+      var pr=purrEl.play();
+      if(pr && pr.catch) pr.catch(function(){sonando=false; purrFalla=true; purrSintetico()});
+      return;
+    }
+    purrSintetico();
   });
 
   tick();
