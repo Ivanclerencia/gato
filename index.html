@@ -13,6 +13,7 @@
 <meta name="theme-color" content="#efeeea">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
+<script>window.GATO_FOTOS={dia:"https://d8j0ntlcm91z4.cloudfront.net/user_32LJ8f9E5MwlOKpFunJdszlaVTp/hf_20261124_221125_b10feb73-6331-4a47-be71-4f637696d2ca.png",noche:"https://d8j0ntlcm91z4.cloudfront.net/user_32LJ8f9E5MwlOKpFunJdszlaVTp/hf_20261124_221159_79b32877-d59c-4a73-8985-39fa36dbd126.png"};</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
 <style>
@@ -44,7 +45,10 @@ main{max-width:440px;margin:0 auto;height:100%;display:flex;flex-direction:colum
 main[data-vista="hoy"] .barra{color:#17150f}
 :root[data-estado="cerrado"] main[data-vista="hoy"] .barra{color:#eceef5}
 
-.escena{flex:none;height:46%;background:var(--wall);cursor:pointer;overflow:hidden}
+.escena{flex:none;height:46%;background:var(--wall);cursor:pointer;overflow:hidden;position:relative}
+.foto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 100%;opacity:0;transition:opacity 1.2s ease;animation:fotoRespira 6s ease-in-out infinite;transform-origin:50% 100%}
+:root[data-estado="abierto"] #fotoDia.ok,:root[data-estado="cerrado"] #fotoNoche.ok{opacity:1}
+@keyframes fotoRespira{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
 .escena>svg{display:block;width:100%;height:100%}
 .escena>svg *{transition:fill 1.2s ease,stroke 1.2s ease,opacity 1.2s ease}
 main[data-vista="compra"] .escena{display:none}
@@ -110,7 +114,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 @keyframes respira{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.05)}}
 @keyframes zz{0%{opacity:0;transform:translate(0,0)}30%{opacity:.9}100%{opacity:0;transform:translate(14px,-34px)}}
 @media (prefers-reduced-motion:reduce){
-  .ojos,.cabeza,.respira,.zz text,.purr,.cola,.prr{animation:none}.zz text{opacity:.8}
+  .ojos,.cabeza,.respira,.zz text,.purr,.cola,.prr,.foto{animation:none}.zz text{opacity:.8}
   #despierto,#dormido,.escena>svg *,body,.panel,.fila,.seg,.seg i{transition:none}
 }
 </style>
@@ -226,6 +230,8 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
       <rect width="400" height="500" fill="url(#vin)" style="opacity:var(--vin)" pointer-events="none"/>
       <g fill="#fff" style="opacity:var(--noche)"><circle cx="92" cy="40" r="1.6"/><circle cx="330" cy="30" r="1.3"/><circle cx="372" cy="150" r="1.4"/><circle cx="86" cy="170" r="1.2"/></g>
     </svg>
+    <img class="foto" id="fotoDia" alt="" hidden>
+    <img class="foto" id="fotoNoche" alt="" hidden>
   </div>
 
   <section class="panel">
@@ -505,6 +511,17 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
     p.appendChild(i); p.appendChild(b); p.appendChild(m); box.appendChild(p);
   }
   $("desconectar").addEventListener("click",function(){API=null; try{localStorage.removeItem("gato-api");localStorage.removeItem("gato-ev")}catch(e){} ponerK(null); E=[]; calError=null; $("pie").hidden=true; $("menu").hidden=true; render();});
+
+  // --- ilustraciones de los gatos (si no cargan, se queda el dibujo)
+  (function(){
+    var F=window.GATO_FOTOS; if(!F) return;
+    [["fotoDia",F.dia],["fotoNoche",F.noche]].forEach(function(x){
+      if(!x[1]) return; var im=$(x[0]);
+      im.addEventListener("load",function(){im.classList.add("ok")});
+      im.addEventListener("error",function(){im.hidden=true});
+      im.hidden=false; im.src=x[1];
+    });
+  })();
 
   // --- ronroneo al tocar al gato
   var actx=null;
