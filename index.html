@@ -22,7 +22,7 @@
    abajo un panel plano y sobrio con la lista. Poco radio, una sola tinta, una sola familia tipográfica. */
 :root{
   color-scheme: light;
-  --paper:#efeeea; --row:#f8f7f4; --ink:#17150f; --muted:#7c786f; --line:#d9d6ce; --hecho:#dde5d9; --verde:#5c7a58;
+  --paper:#efeeea; --row:#f8f7f4; --ink:#17150f; --muted:#7c786f; --line:#d9d6ce; --hecho:#dde5d9; --verde:#5c7a58; --brillo:rgba(255,255,255,.85); --filo:rgba(255,255,255,.9);
   --wall:#e6d8bf; --luz:#fff6dc; --cortina:#f5eedd; --pliegue:#e2d6bd; --madera:#8a5a36; --hoja:#5d7a4f;
   --sofa:#b4532e; --pana:#96421f; --vin:0; --noche:0;
   --serif:"DM Sans","Helvetica Neue",system-ui,sans-serif;
@@ -30,7 +30,7 @@
 }
 :root[data-estado="cerrado"]{
   color-scheme: dark;
-  --paper:#13151d; --row:#1b1e29; --ink:#eceef5; --muted:#8d92a5; --line:#2a2e3d; --hecho:#1d2925; --verde:#8fb08a;
+  --paper:#13151d; --row:#1b1e29; --ink:#eceef5; --muted:#8d92a5; --line:#2a2e3d; --hecho:#1d2925; --verde:#8fb08a; --brillo:rgba(255,255,255,.16); --filo:rgba(255,255,255,.22);
   --vin:.5; --noche:.66;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -78,9 +78,16 @@ h1{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1.05;lett
 
 .lista{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;list-style:none;margin:0;padding:0;scrollbar-width:none}
 .lista::-webkit-scrollbar{display:none}
-.fila{position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;background:var(--row);border-radius:8px;padding:13px 14px;margin-bottom:6px;cursor:pointer;transition:background-color 1.2s ease}
-.fila::before{content:"";position:absolute;inset:0;background:var(--hecho);transform:scaleX(0);transform-origin:0 50%;transition:transform .3s ease}
-.fila.marcando::before{transform:scaleX(1)}
+.fila{position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;background:var(--row);border-radius:8px;padding:13px 14px;margin-bottom:6px;cursor:pointer;
+  scale:1;transition:scale .55s cubic-bezier(.34,1.56,.64,1),box-shadow .45s ease,background-color 1.2s ease}
+/* al tocar: la fila cede un poco, le pasa un brillo por donde está el dedo y vuelve con rebote suave */
+.fila.pres{scale:.965;transition:scale .16s ease-out,box-shadow .16s ease-out;box-shadow:inset 0 0 0 1px var(--filo),0 10px 22px -14px rgba(0,0,0,.45)}
+.fila::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .5s ease;
+  background:radial-gradient(130px circle at var(--x,50%) var(--y,50%),var(--brillo),rgba(255,255,255,0) 70%)}
+.fila.pres::after{opacity:1;transition:opacity .12s ease-out}
+/* al marcar: el color se extiende como una gota desde donde has tocado */
+.fila::before{content:"";position:absolute;inset:0;background:var(--hecho);clip-path:circle(0px at var(--x,50%) var(--y,50%));transition:clip-path .5s cubic-bezier(.2,.8,.2,1)}
+.fila.marcando::before{clip-path:circle(150% at var(--x,50%) var(--y,50%))}
 .fila>*{position:relative}
 .fila .txt{flex:1;min-width:0}
 .fila .tit{font-weight:500;overflow-wrap:anywhere;transition:color .3s ease}
@@ -100,6 +107,9 @@ h1{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1.05;lett
   -webkit-user-select:text;user-select:text;transition:background-color 1.2s ease,border-color 1.2s ease}
 .add input::placeholder{color:var(--muted)}
 .add input:focus{outline:none;border-color:var(--ink)}
+.add button,.icono,.menu nav button{scale:1;transition:scale .5s cubic-bezier(.34,1.56,.64,1)}
+.add button:active,.icono:active{scale:.9;transition:scale .12s ease-out}
+.menu nav button:active{scale:.97;transition:scale .12s ease-out}
 .add button{flex:none;width:48px;height:48px;border-radius:8px;border:0;background:var(--ink);color:var(--paper);font-size:24px;line-height:1;cursor:pointer;font-family:var(--mono)}
 button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 #avisoGuardado{margin:8px 0 0}
@@ -132,7 +142,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 @keyframes zz{0%{opacity:0;transform:translate(0,0)}30%{opacity:.9}100%{opacity:0;transform:translate(14px,-34px)}}
 @media (prefers-reduced-motion:reduce){
   .ojos,.cabeza,.respira,.zz text,.purr,.cola,.prr,.foto,.motas i,.brillo i,.zs span{animation:none}.zz text{opacity:.8}
-  #despierto,#dormido,.escena>svg *,body,.panel,.fila,.fila::before,.seg,.seg i{transition:none}
+  #despierto,#dormido,.escena>svg *,body,.panel,.fila,.fila::before,.fila::after,.seg,.seg i{transition:none}
 }
 </style>
 </head>
@@ -350,8 +360,14 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
       if(ocupado) return;
       if(hecho||sinMov){conMovimiento(alMarcar);return}
       ocupado=true; li.classList.add("marcando");
-      setTimeout(function(){ocupado=false; conMovimiento(alMarcar)},330);
+      setTimeout(function(){ocupado=false; conMovimiento(alMarcar)},470);
     }
+    li.addEventListener("pointerdown",function(ev){
+      if(ev.target.closest&&ev.target.closest(".lnk")) return;
+      var r=li.getBoundingClientRect(); li.style.setProperty("--x",(ev.clientX-r.left)+"px"); li.style.setProperty("--y",(ev.clientY-r.top)+"px");
+      li.classList.add("pres");
+    });
+    ["pointerup","pointercancel","pointerleave"].forEach(function(n){li.addEventListener(n,function(){li.classList.remove("pres")})});
     li.addEventListener("click",pulsar);
     li.addEventListener("keydown",function(ev){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();pulsar(ev)}});
     return li;
