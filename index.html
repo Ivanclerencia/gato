@@ -559,20 +559,22 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
   // --- ronroneo al tocar a los gatos: pulsos graves que suben y bajan con la respiración
   var actx=null, purrBuf=null, sonando=false;
   function hacerPurr(ctx){
-    var sr=ctx.sampleRate, d=4.8, n=Math.floor(sr*d), buf=ctx.createBuffer(1,n,sr), ch=buf.getChannelData(0);
-    var fase=0, lp=0, lp2=0, max=0;
+    var sr=ctx.sampleRate, d=5, n=Math.floor(sr*d), buf=ctx.createBuffer(1,n,sr), ch=buf.getChannelData(0);
+    var fase=0, a1=0, a2=0, g=0, max=0;
     for(var i=0;i<n;i++){
-      var t=i/sr, ciclo=t%2.4, inh=ciclo<1.05;
-      var x=inh?ciclo/1.05:(ciclo-1.05)/1.35;
-      var resp=Math.pow(Math.sin(Math.PI*x),0.55)*(inh?1:0.78)*0.92+0.08;   // inspira y espira, sin llegar a cortarse
-      fase+=(inh?27:23)/sr; if(fase>=1) fase-=1;
-      var pulso=Math.exp(-fase*5.5);                                         // cada golpecito del ronroneo
-      var r=Math.random()*2-1; lp+=(r-lp)*0.12; lp2+=(lp-lp2)*0.12;          // aire, filtrado
-      var tono=Math.sin(2*Math.PI*fase*8)*0.30+Math.sin(2*Math.PI*fase*12)*0.20+Math.sin(2*Math.PI*fase*18)*0.10;
-      var borde=Math.min(1,t/0.6)*Math.min(1,(d-t)/1.1);                     // entra y sale suave
-      var v=(lp2*6+tono)*pulso*resp*borde; ch[i]=v; if(Math.abs(v)>max) max=Math.abs(v);
+      var t=i/sr, ciclo=t%2.2, inh=ciclo<1;
+      var x=inh?ciclo:(ciclo-1)/1.2;
+      var resp=0.72+0.28*Math.sin(Math.PI*x)*(inh?1:0.85);                  // respiración suave, nunca baja a cero
+      fase+=(inh?29:26)/sr; if(fase>=1) fase-=1;
+      var onda=0.5+0.5*Math.cos(2*Math.PI*fase);                             // vibración redondeada, sin golpes
+      var mod=0.42+0.58*onda*Math.sqrt(onda);
+      var r=Math.random()*2-1; a1+=(r-a1)*0.10; a2+=(a1-a2)*0.10; g+=(a2-g)*0.012;   // aire en la zona media, sin retumbar
+      var aire=(a2-g)*5;
+      var tono=Math.sin(2*Math.PI*fase*6)*0.16+Math.sin(2*Math.PI*fase*10)*0.09;
+      var borde=Math.min(1,t/0.7)*Math.min(1,(d-t)/1.2);
+      var v=(aire+tono)*mod*resp*borde; ch[i]=v; if(Math.abs(v)>max) max=Math.abs(v);
     }
-    if(max>0){var k=1/max; for(var j=0;j<n;j++) ch[j]=Math.tanh(ch[j]*k*3.2)*0.8;}   // más cuerpo sin saturar
+    if(max>0){var k=0.5/max; for(var j=0;j<n;j++) ch[j]*=k;}                // volumen contenido, sin saturar
     return buf;
   }
   $("escena").addEventListener("click",function(){
