@@ -13,6 +13,7 @@
 <meta name="theme-color" content="#efeeea">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
+<link rel="preload" as="image" href="https://d8j0ntlcm91z4.cloudfront.net/user_32LJ8f9E5MwlOKpFunJdszlaVTp/hf_20261124_221125_b10feb73-6331-4a47-be71-4f637696d2ca.png">
 <script>window.GATO_FOTOS={dia:"https://d8j0ntlcm91z4.cloudfront.net/user_32LJ8f9E5MwlOKpFunJdszlaVTp/hf_20261124_221125_b10feb73-6331-4a47-be71-4f637696d2ca.png",noche:"https://d8j0ntlcm91z4.cloudfront.net/user_32LJ8f9E5MwlOKpFunJdszlaVTp/hf_20261124_221159_79b32877-d59c-4a73-8985-39fa36dbd126.png"};</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,7 +22,7 @@
    abajo un panel plano y sobrio con la lista. Poco radio, una sola tinta, una sola familia tipográfica. */
 :root{
   color-scheme: light;
-  --paper:#efeeea; --row:#f8f7f4; --ink:#17150f; --muted:#7c786f; --line:#d9d6ce;
+  --paper:#efeeea; --row:#f8f7f4; --ink:#17150f; --muted:#7c786f; --line:#d9d6ce; --hecho:#dde5d9; --verde:#5c7a58;
   --wall:#e6d8bf; --luz:#fff6dc; --cortina:#f5eedd; --pliegue:#e2d6bd; --madera:#8a5a36; --hoja:#5d7a4f;
   --sofa:#b4532e; --pana:#96421f; --vin:0; --noche:0;
   --serif:"DM Sans","Helvetica Neue",system-ui,sans-serif;
@@ -29,7 +30,7 @@
 }
 :root[data-estado="cerrado"]{
   color-scheme: dark;
-  --paper:#13151d; --row:#1b1e29; --ink:#eceef5; --muted:#8d92a5; --line:#2a2e3d;
+  --paper:#13151d; --row:#1b1e29; --ink:#eceef5; --muted:#8d92a5; --line:#2a2e3d; --hecho:#1d2925; --verde:#8fb08a;
   --vin:.5; --noche:.66;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -49,6 +50,9 @@ main[data-vista="hoy"] .barra{color:#17150f}
 .foto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 100%;opacity:0;transition:opacity 1.2s ease;animation:fotoRespira 6s ease-in-out infinite;transform-origin:50% 100%}
 :root[data-estado="abierto"] #fotoDia.ok,:root[data-estado="cerrado"] #fotoNoche.ok{opacity:1}
 @keyframes fotoRespira{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+.esperafoto>svg{visibility:hidden}
+.esperafoto{background:#e6d8bf}
+:root[data-estado="cerrado"] .esperafoto{background:#1c2238}
 .capa{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 1.2s ease}
 :root[data-estado="abierto"] .confoto .motas,:root[data-estado="cerrado"] .confoto .brillo,:root[data-estado="cerrado"] .confoto .zs{opacity:1}
 .motas i{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff8e0;filter:blur(.5px);opacity:0;animation:mota linear infinite}
@@ -74,15 +78,18 @@ h1{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1.05;lett
 
 .lista{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;list-style:none;margin:0;padding:0;scrollbar-width:none}
 .lista::-webkit-scrollbar{display:none}
-.fila{display:flex;align-items:center;gap:12px;background:var(--row);border-radius:8px;padding:11px 10px 11px 14px;margin-bottom:6px;transition:background-color 1.2s ease}
+.fila{position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;background:var(--row);border-radius:8px;padding:13px 14px;margin-bottom:6px;cursor:pointer;transition:background-color 1.2s ease}
+.fila::before{content:"";position:absolute;inset:0;background:var(--hecho);transform:scaleX(0);transform-origin:0 50%;transition:transform .3s ease}
+.fila.marcando::before{transform:scaleX(1)}
+.fila>*{position:relative}
 .fila .txt{flex:1;min-width:0}
-.fila .tit{font-weight:500;overflow-wrap:anywhere}
+.fila .tit{font-weight:500;overflow-wrap:anywhere;transition:color .3s ease}
 .fila .sub{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:11.5px;color:var(--muted);margin-top:3px}
-.fila.hecho .tit{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px;font-weight:400}
+.fila .marca{flex:none;font-size:14px;color:var(--verde);opacity:0;transition:opacity .3s ease}
+.fila.hecho{background:var(--hecho)}
+.fila.hecho .tit,.fila.marcando .tit{color:var(--muted);font-weight:400}
+.fila.hecho .marca,.fila.marcando .marca{opacity:1}
 .lnk{background:none;border:0;padding:0;font:inherit;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.caja{flex:none;width:40px;height:40px;border:0;background:transparent;padding:0;cursor:pointer;display:grid;place-items:center}
-.caja i{width:22px;height:22px;border:1.5px solid var(--ink);border-radius:6px;display:grid;place-items:center;font-style:normal;font-size:13px;line-height:1;color:transparent;transition:background-color .2s ease}
-.caja[aria-pressed="true"] i{background:var(--ink);color:var(--paper)}
 .vacio{font-size:13px;color:var(--muted);margin:0 0 8px}
 .aviso{font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;-webkit-user-select:text;user-select:text}
 .aviso button{display:block;margin-top:8px;height:38px;padding:0 14px;border-radius:8px;border:1px solid var(--ink);background:transparent;color:var(--ink);font:inherit;font-weight:500;cursor:pointer}
@@ -125,7 +132,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 @keyframes zz{0%{opacity:0;transform:translate(0,0)}30%{opacity:.9}100%{opacity:0;transform:translate(14px,-34px)}}
 @media (prefers-reduced-motion:reduce){
   .ojos,.cabeza,.respira,.zz text,.purr,.cola,.prr,.foto,.motas i,.brillo i,.zs span{animation:none}.zz text{opacity:.8}
-  #despierto,#dormido,.escena>svg *,body,.panel,.fila,.seg,.seg i{transition:none}
+  #despierto,#dormido,.escena>svg *,body,.panel,.fila,.fila::before,.seg,.seg i{transition:none}
 }
 </style>
 </head>
@@ -319,14 +326,35 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 
   function el(tag,cls,txt){var n=document.createElement(tag); if(cls) n.className=cls; if(txt!=null) n.textContent=txt; return n}
   function lnk(txt,fn){var b=el("button","lnk",txt); b.type="button"; b.addEventListener("click",fn); return b}
-  function fila(titulo,hecho,subs,alMarcar){
-    var li=el("li","fila"+(hecho?" hecho":""));
+  var ocupado=false, sinMov=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  // al cambiar algo, las filas se deslizan hasta su sitio nuevo en vez de saltar
+  function conMovimiento(cambio){
+    var antes={}; Array.prototype.forEach.call($("lista").children,function(li){antes[li.getAttribute("data-k")]=li.getBoundingClientRect().top});
+    cambio();
+    if(sinMov) return;
+    Array.prototype.forEach.call($("lista").children,function(li){
+      var a=antes[li.getAttribute("data-k")]; if(a==null) return;
+      var d=a-li.getBoundingClientRect().top; if(!d) return;
+      li.style.transition="none"; li.style.transform="translateY("+d+"px)";
+      requestAnimationFrame(function(){requestAnimationFrame(function(){li.style.transition="transform .38s cubic-bezier(.2,.7,.2,1)"; li.style.transform="";})});
+    });
+  }
+  function fila(clave,titulo,hecho,subs,alMarcar){
+    var li=el("li","fila"+(hecho?" hecho":"")); li.setAttribute("data-k",clave);
+    li.setAttribute("role","button"); li.tabIndex=0; li.setAttribute("aria-pressed",hecho?"true":"false");
     var tx=el("div","txt"); tx.appendChild(el("div","tit",titulo));
     if(subs&&subs.length){var s=el("div","sub"); subs.forEach(function(x){s.appendChild(typeof x==="string"?el("span",null,x):x)}); tx.appendChild(s);}
-    var b=el("button","caja"); b.type="button"; b.appendChild(el("i",null,"✓"));
-    b.setAttribute("aria-pressed",hecho?"true":"false"); b.setAttribute("aria-label",(hecho?"Desmarcar: ":"Marcar: ")+titulo);
-    b.addEventListener("click",alMarcar);
-    li.appendChild(tx); li.appendChild(b); return li;
+    li.appendChild(tx); li.appendChild(el("span","marca","✓"));
+    function pulsar(ev){
+      if(ev.target.closest&&ev.target.closest(".lnk")) return;
+      if(ocupado) return;
+      if(hecho||sinMov){conMovimiento(alMarcar);return}
+      ocupado=true; li.classList.add("marcando");
+      setTimeout(function(){ocupado=false; conMovimiento(alMarcar)},330);
+    }
+    li.addEventListener("click",pulsar);
+    li.addEventListener("keydown",function(ev){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();pulsar(ev)}});
+    return li;
   }
 
   function render(){
@@ -352,7 +380,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
         if(c.length>faltan){cu.appendChild(document.createTextNode(" · ")); cu.appendChild(lnk("borrar comprados",function(){S.compra=S.compra.filter(function(x){return !x.done});save();render()}));} }
       $("barraProg").style.width=c.length?Math.round(100*(c.length-faltan)/c.length)+"%":"0";
       c.filter(function(x){return !x.done}).concat(c.filter(function(x){return x.done})).forEach(function(x){
-        ul.appendChild(fila(String(x.t||""),!!x.done,x.done?null:[lnk("quitar",function(){S.compra=S.compra.filter(function(y){return y.id!==x.id});save();render()})],
+        ul.appendChild(fila(x.id,String(x.t||""),!!x.done,x.done?null:[lnk("quitar",function(){S.compra=S.compra.filter(function(y){return y.id!==x.id});save();render()})],
           function(){x.done=!x.done;save();render()}));
       });
       if(!c.length){vacio.hidden=false;vacio.textContent="La lista está vacía. Apunta abajo lo que falte.";}
@@ -378,7 +406,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
         else{subs.push(lnk("mañana",function(){var x=buscar(it.key);if(x){x.desde=addDays(today,1);save();render()}}));
              subs.push(lnk("quitar",function(){S.manual=S.manual.filter(function(x){return x.id!==it.key});save();render()}));}
       }
-      ul.appendChild(fila(it.titulo,!!it.estado,subs,function(){toggle(it)}));
+      ul.appendChild(fila(it.key,it.titulo,!!it.estado,subs,function(){toggle(it)}));
     });
     renderAvisoCal();
   }
@@ -546,12 +574,13 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
   // --- ilustraciones de los gatos (si no cargan, se queda el dibujo)
   (function(){
     var F=window.GATO_FOTOS; if(!F) return;
+    $("escena").classList.add("esperafoto");   // mientras cargan las ilustraciones no se enseña el dibujo antiguo
     var mo=$("motas"); for(var n=0;n<14;n++){var i=document.createElement("i"); i.style.left=(8+Math.random()*84)+"%"; i.style.top=(20+Math.random()*70)+"%";
       i.style.animationDuration=(7+Math.random()*8).toFixed(1)+"s"; i.style.animationDelay=(-Math.random()*12).toFixed(1)+"s"; mo.appendChild(i);}
     [["fotoDia",F.dia],["fotoNoche",F.noche]].forEach(function(x){
       if(!x[1]) return; var im=$(x[0]);
       im.addEventListener("load",function(){im.classList.add("ok"); $("escena").classList.add("confoto")});
-      im.addEventListener("error",function(){im.hidden=true});
+      im.addEventListener("error",function(){im.hidden=true; $("escena").classList.remove("esperafoto")});   // solo si falla vuelve el dibujo
       im.hidden=false; im.src=x[1];
     });
   })();
