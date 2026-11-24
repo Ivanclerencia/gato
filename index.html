@@ -48,7 +48,15 @@ main[data-vista="hoy"] .barra{color:#17150f}
 .escena{flex:none;height:46%;background:var(--wall);cursor:pointer;overflow:hidden;position:relative}
 .foto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 100%;opacity:0;transition:opacity 1.2s ease;animation:fotoRespira 6s ease-in-out infinite;transform-origin:50% 100%}
 :root[data-estado="abierto"] #fotoDia.ok,:root[data-estado="cerrado"] #fotoNoche.ok{opacity:1}
-@keyframes fotoRespira{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
+@keyframes fotoRespira{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+.capa{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 1.2s ease}
+:root[data-estado="abierto"] .confoto .motas,:root[data-estado="cerrado"] .confoto .brillo,:root[data-estado="cerrado"] .confoto .zs{opacity:1}
+.motas i{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff8e0;filter:blur(.5px);opacity:0;animation:mota linear infinite}
+@keyframes mota{0%{transform:translate(0,0);opacity:0}15%{opacity:.85}80%{opacity:.6}100%{transform:translate(28px,-64px);opacity:0}}
+.brillo i{position:absolute;inset:0;background:radial-gradient(circle at 50% 80%,rgba(255,186,104,.32),transparent 58%);mix-blend-mode:screen;animation:brillo 5.5s ease-in-out infinite}
+@keyframes brillo{0%,100%{opacity:.45}50%{opacity:1}}
+.zs span{position:absolute;font-family:var(--serif);color:#fff;opacity:0;animation:zz 4.4s ease-in-out infinite}
+.zs span:nth-child(1){left:60%;top:36%;font-size:20px}.zs span:nth-child(2){left:65%;top:28%;font-size:26px;animation-delay:1.45s}.zs span:nth-child(3){left:71%;top:18%;font-size:34px;animation-delay:2.9s}
 .escena>svg{display:block;width:100%;height:100%}
 .escena>svg *{transition:fill 1.2s ease,stroke 1.2s ease,opacity 1.2s ease}
 main[data-vista="compra"] .escena{display:none}
@@ -114,7 +122,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 @keyframes respira{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.05)}}
 @keyframes zz{0%{opacity:0;transform:translate(0,0)}30%{opacity:.9}100%{opacity:0;transform:translate(14px,-34px)}}
 @media (prefers-reduced-motion:reduce){
-  .ojos,.cabeza,.respira,.zz text,.purr,.cola,.prr,.foto{animation:none}.zz text{opacity:.8}
+  .ojos,.cabeza,.respira,.zz text,.purr,.cola,.prr,.foto,.motas i,.brillo i,.zs span{animation:none}.zz text{opacity:.8}
   #despierto,#dormido,.escena>svg *,body,.panel,.fila,.seg,.seg i{transition:none}
 }
 </style>
@@ -232,6 +240,9 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
     </svg>
     <img class="foto" id="fotoDia" alt="" hidden>
     <img class="foto" id="fotoNoche" alt="" hidden>
+    <div class="capa motas" id="motas"></div>
+    <div class="capa brillo"><i></i></div>
+    <div class="capa zs"><span>z</span><span>z</span><span>z</span></div>
   </div>
 
   <section class="panel">
@@ -515,9 +526,11 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
   // --- ilustraciones de los gatos (si no cargan, se queda el dibujo)
   (function(){
     var F=window.GATO_FOTOS; if(!F) return;
+    var mo=$("motas"); for(var n=0;n<14;n++){var i=document.createElement("i"); i.style.left=(8+Math.random()*84)+"%"; i.style.top=(20+Math.random()*70)+"%";
+      i.style.animationDuration=(7+Math.random()*8).toFixed(1)+"s"; i.style.animationDelay=(-Math.random()*12).toFixed(1)+"s"; mo.appendChild(i);}
     [["fotoDia",F.dia],["fotoNoche",F.noche]].forEach(function(x){
       if(!x[1]) return; var im=$(x[0]);
-      im.addEventListener("load",function(){im.classList.add("ok")});
+      im.addEventListener("load",function(){im.classList.add("ok"); $("escena").classList.add("confoto")});
       im.addEventListener("error",function(){im.hidden=true});
       im.hidden=false; im.src=x[1];
     });
