@@ -556,21 +556,36 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
     });
   })();
 
-  // --- ronroneo al tocar al gato
-  var actx=null;
+  // --- ronroneo al tocar a los gatos: pulsos graves que suben y bajan con la respiración
+  var actx=null, purrBuf=null, sonando=false;
+  function hacerPurr(ctx){
+    var sr=ctx.sampleRate, d=4.8, n=Math.floor(sr*d), buf=ctx.createBuffer(1,n,sr), ch=buf.getChannelData(0);
+    var fase=0, lp=0, lp2=0, max=0;
+    for(var i=0;i<n;i++){
+      var t=i/sr, ciclo=t%2.4, inh=ciclo<1.05;
+      var x=inh?ciclo/1.05:(ciclo-1.05)/1.35;
+      var resp=Math.pow(Math.sin(Math.PI*x),0.55)*(inh?1:0.78)*0.92+0.08;   // inspira y espira, sin llegar a cortarse
+      fase+=(inh?27:23)/sr; if(fase>=1) fase-=1;
+      var pulso=Math.exp(-fase*5.5);                                         // cada golpecito del ronroneo
+      var r=Math.random()*2-1; lp+=(r-lp)*0.12; lp2+=(lp-lp2)*0.12;          // aire, filtrado
+      var tono=Math.sin(2*Math.PI*fase*8)*0.30+Math.sin(2*Math.PI*fase*12)*0.20+Math.sin(2*Math.PI*fase*18)*0.10;
+      var borde=Math.min(1,t/0.6)*Math.min(1,(d-t)/1.1);                     // entra y sale suave
+      var v=(lp2*6+tono)*pulso*resp*borde; ch[i]=v; if(Math.abs(v)>max) max=Math.abs(v);
+    }
+    if(max>0){var k=0.85/max; for(var j=0;j<n;j++) ch[j]*=k;}
+    return buf;
+  }
   $("escena").addEventListener("click",function(){
+    if(sonando) return;
     try{
-      var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return; actx=actx||new AC(); if(actx.state==="suspended") actx.resume();
-      var t=actx.currentTime, d=2.8, n=Math.floor(actx.sampleRate*d), buf=actx.createBuffer(1,n,actx.sampleRate), ch=buf.getChannelData(0), last=0;
-      for(var k=0;k<n;k++){var w=Math.random()*2-1; last=(last+0.02*w)/1.02; ch[k]=last*3.5;}
-      var src=actx.createBufferSource(); src.buffer=buf;
-      var lp=actx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=240;
-      var trem=actx.createGain(); trem.gain.value=.55;
-      var lfo=actx.createOscillator(); lfo.type="sawtooth"; lfo.frequency.value=24; var lg=actx.createGain(); lg.gain.value=.45;
-      var env=actx.createGain(); env.gain.setValueAtTime(0,t); env.gain.linearRampToValueAtTime(.9,t+.4); env.gain.linearRampToValueAtTime(0,t+d);
-      lfo.connect(lg); lg.connect(trem.gain); src.connect(lp); lp.connect(trem); trem.connect(env); env.connect(actx.destination);
-      src.start(t); lfo.start(t); lfo.stop(t+d);
-    }catch(e){}
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return; actx=actx||new AC();
+      var tocar=function(){
+        purrBuf=purrBuf||hacerPurr(actx);
+        var src=actx.createBufferSource(); src.buffer=purrBuf; src.connect(actx.destination);
+        sonando=true; src.onended=function(){sonando=false}; src.start();
+      };
+      if(actx.state==="suspended") actx.resume().then(tocar,function(){}); else tocar();
+    }catch(e){sonando=false}
   });
 
   tick();
