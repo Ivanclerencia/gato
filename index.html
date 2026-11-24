@@ -60,6 +60,8 @@ main[data-vista="hoy"] .barra{color:#17150f}
 .escena>svg{display:block;width:100%;height:100%}
 .escena>svg *{transition:fill 1.2s ease,stroke 1.2s ease,opacity 1.2s ease}
 main[data-vista="compra"] .escena{display:none}
+main.teclado .escena{display:none}
+main.teclado .panel{padding-top:54px;border-top:0}
 main[data-vista="compra"] .panel{padding-top:54px;border-top:0}
 
 .panel{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--paper);border-top:1px solid var(--line);
@@ -429,6 +431,24 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
     var l=ev.target.closest?ev.target.closest(".lista"):null;
     if(!l || l.scrollHeight<=l.clientHeight) ev.preventDefault();
   },{passive:false});
+
+  // --- teclado del móvil: la app se encoge al hueco visible en vez de irse hacia arriba
+  (function(){
+    var vv=window.visualViewport; if(!vv) return;
+    var app=$("app"), pend=false;
+    function ajustar(){
+      pend=false;
+      var conTeclado=vv.height<window.innerHeight-120;
+      app.style.height=conTeclado?Math.round(vv.height)+"px":"";
+      app.classList.toggle("teclado",conTeclado);
+      if(window.scrollY||document.documentElement.scrollTop||vv.offsetTop) window.scrollTo(0,0);
+    }
+    function pedir(){ if(!pend){pend=true; requestAnimationFrame(ajustar);} }
+    vv.addEventListener("resize",pedir); vv.addEventListener("scroll",pedir);
+    window.addEventListener("scroll",pedir,{passive:true});
+    document.addEventListener("focusin",function(){setTimeout(ajustar,60);setTimeout(ajustar,350)});
+    document.addEventListener("focusout",function(){setTimeout(ajustar,60);setTimeout(ajustar,350)});
+  })();
 
   // --- calendario dentro de Claude
   var CAL="Google Calendar", TOOL="list_events";
