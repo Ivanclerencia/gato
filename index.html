@@ -15,17 +15,17 @@
 <meta name="referrer" content="no-referrer">
 <script>window.GATO_FOTOS={dia:"https://d8j0ntlcm91z4.cloudfront.net/user_32LJ8f9E5MwlOKpFunJdszlaVTp/hf_20261124_221125_b10feb73-6331-4a47-be71-4f637696d2ca.png",noche:"https://d8j0ntlcm91z4.cloudfront.net/user_32LJ8f9E5MwlOKpFunJdszlaVTp/hf_20261124_221159_79b32877-d59c-4a73-8985-39fa36dbd126.png"};</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* Idea: pantalla bloqueada en dos bloques con un corte recto: arriba la habitación con el gato,
-   abajo un panel plano y sobrio con la lista. Poco radio, una sola tinta, tipografía mono + serif. */
+/* Idea: pantalla bloqueada en dos bloques con un corte recto: arriba la habitación con los gatos,
+   abajo un panel plano y sobrio con la lista. Poco radio, una sola tinta, una sola familia tipográfica. */
 :root{
   color-scheme: light;
   --paper:#efeeea; --row:#f8f7f4; --ink:#17150f; --muted:#7c786f; --line:#d9d6ce;
   --wall:#e6d8bf; --luz:#fff6dc; --cortina:#f5eedd; --pliegue:#e2d6bd; --madera:#8a5a36; --hoja:#5d7a4f;
   --sofa:#b4532e; --pana:#96421f; --vin:0; --noche:0;
-  --serif:"Instrument Serif","Iowan Old Style",Georgia,serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --serif:"DM Sans","Helvetica Neue",system-ui,sans-serif;
+  --mono:"DM Sans","Helvetica Neue",system-ui,sans-serif;
 }
 :root[data-estado="cerrado"]{
   color-scheme: dark;
@@ -67,7 +67,7 @@ main[data-vista="compra"] .panel{padding-top:54px;border-top:0}
 .panel{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--paper);border-top:1px solid var(--line);
   padding:18px 16px 14px;transition:background-color 1.2s ease,border-color 1.2s ease}
 .cab{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 12px;flex:none}
-h1{font-family:var(--serif);font-weight:400;font-size:38px;line-height:1;letter-spacing:-.01em;margin:0;white-space:nowrap}
+h1{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1.05;letter-spacing:-.03em;margin:0;white-space:nowrap}
 #cuenta{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .seg{flex:none;height:2px;background:var(--line);margin:14px 0 14px;transition:background-color 1.2s ease}
 .seg i{display:block;height:100%;width:0;background:var(--ink);transition:width .5s ease,background-color 1.2s ease}
@@ -100,7 +100,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .menu{position:absolute;inset:0;z-index:10;background:var(--paper);display:flex;flex-direction:column;padding:10px 12px 20px}
 .menu[hidden]{display:none}
 .menu nav{flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 12px}
-.menu nav button{font-family:var(--serif);font-size:44px;line-height:1.1;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 0;color:var(--muted);cursor:pointer}
+.menu nav button{font-family:var(--serif);font-weight:600;letter-spacing:-.03em;font-size:38px;line-height:1.1;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 0;color:var(--muted);cursor:pointer}
 .menu nav button[aria-current="page"]{color:var(--ink)}
 .menu .pie{padding:0 12px;font-size:12px}
 
