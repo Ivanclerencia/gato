@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El gato en el sofá</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gato">
+<meta name="theme-color" content="#e6d8bf">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Idea: la habitación ocupa la pantalla de borde a borde, con el titular gigante detrás del gato.
+   Encima se apoya una hoja de cristal con las cosas de hoy como tarjetas de color apiladas.
+   Al cerrar el día, el fondo pasa de tarde clara a atardecer oscuro. */
+:root{
+  color-scheme: light;
+  --bg1:#e6d8bf; --ink:#26170d; --muted:#6d5a48;
+  --glass:rgba(255,255,255,.46); --glass-b:rgba(255,255,255,.75); --glass-2:rgba(255,255,255,.3);
+  --accent:#ffd05e; --on-accent:#26170d; --dark:#26170d; --on-dark:#fff3df;
+  --wall:#e6d8bf; --luz:#fff6dc; --cortina:#f5eedd; --pliegue:#e2d6bd; --madera:#8a5a36; --hoja:#5d7a4f;
+  --sofa:#b4532e; --pana:#96421f; --vin:0; --titulo:#ffffff; --titulo-o:.85;
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --body:"Instrument Sans","Helvetica Neue",system-ui,sans-serif;
+}
+:root[data-estado="cerrado"]{
+  color-scheme: dark;
+  --bg1:#c2812f; --ink:#fff3df; --muted:#dcc3a4;
+  --glass:rgba(255,236,210,.13); --glass-b:rgba(255,230,200,.26); --glass-2:rgba(255,236,210,.08);
+  --dark:#fff3df; --on-dark:#26170d;
+  --wall:#c2812f; --luz:#ffd67e; --cortina:#dfae5f; --pliegue:#c4914a; --madera:#5a351d; --hoja:#4c5a2c;
+  --sofa:#8a3a1c; --pana:#6d2b12; --vin:.5; --titulo:#fff0c9; --titulo-o:.9;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:linear-gradient(180deg,#e6d8bf 0,#e6d8bf 320px,#f0dcc0 640px,#e7bf98 100%) fixed;color:var(--ink);
+  font-family:var(--body);font-size:16px;line-height:1.4;transition:color 1.4s ease;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:0;transition:opacity 1.4s ease;
+  background:linear-gradient(180deg,#c2812f 0,#c2812f 300px,#6b3116 620px,#1c100b 100%)}
+:root[data-estado="cerrado"] body::before{opacity:1}
+main{max-width:440px;margin:0 auto;padding:0 0 110px;position:relative}
+
+.escena{position:relative;cursor:pointer}
+.escena svg{display:block;width:100%;height:auto}
+.escena svg *{transition:fill 1.4s ease,stroke 1.4s ease,opacity 1.2s ease}
+.chip{position:absolute;top:18px;left:0;right:0;text-align:center;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.75;transition:color 1.4s ease}
+
+.hoja{position:relative;margin:-34px 10px 0;padding:18px 12px 14px;border-radius:34px;background:var(--glass);border:1px solid var(--glass-b);
+  backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);transition:background-color 1.4s ease,border-color 1.4s ease}
+#sub{margin:0 8px;font-weight:600;font-size:17px;text-wrap:balance}
+.seg{display:flex;gap:5px;margin:12px 8px 16px;height:7px}
+.seg span{flex:1;border-radius:99px;background:var(--glass-2);border:1px solid var(--glass-b);transition:background-color .5s ease}
+.seg span.on{background:var(--dark);border-color:var(--dark)}
+
+ul{list-style:none;margin:0;padding:0}
+.t{position:relative;display:flex;gap:12px;align-items:center;border-radius:28px;padding:16px 14px 16px 18px;color:#26170d;margin-top:-14px;
+  box-shadow:0 -6px 16px -10px rgba(60,25,5,.35)}
+.t:first-child{margin-top:0;box-shadow:none}
+.t:not(:last-child){padding-bottom:30px}
+.t .txt{flex:1;min-width:0}
+.t .tit{font-family:var(--display);font-weight:600;font-size:20px;line-height:1.12;letter-spacing:-.01em;overflow-wrap:anywhere}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.pill{font:inherit;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;border:1.5px solid rgba(38,23,13,.75);background:transparent;color:#26170d}
+button.pill{cursor:pointer;border-style:dashed}
+button.pill:hover{background:rgba(38,23,13,.1)}
+.tic{flex:none;width:52px;height:52px;border-radius:50%;border:2px solid #26170d;background:transparent;color:transparent;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:all .25s ease}
+.tic:hover{background:rgba(38,23,13,.12)}
+.t.hecho{background:var(--glass-2)!important;border:1px solid var(--glass-b);color:var(--muted);box-shadow:none;margin-top:8px;padding:10px 12px 10px 18px}
+.t.hecho .tit{font-size:16px;font-weight:600;text-decoration:line-through;text-decoration-thickness:1.5px;color:var(--muted)}
+.t.hecho .nota{font-size:12px;margin-top:2px}
+.t.hecho .tic{width:40px;height:40px;font-size:17px;background:var(--dark);border-color:var(--dark);color:var(--on-dark)}
+.vacio{font-size:15px;color:var(--muted);margin:0;padding:4px 8px 8px}
+.aviso{font-size:14px;color:var(--muted);margin:10px 0 0;border:1px dashed var(--glass-b);border-radius:18px;padding:10px 14px}
+.aviso button{display:block;margin-top:8px;height:38px;padding:0 14px;border-radius:99px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+
+.conecta input{width:100%;height:44px;margin-top:8px;border-radius:14px;border:1px solid var(--glass-b);background:var(--glass-2);color:var(--ink);font:inherit;padding:0 12px}
+.pie{margin:26px 22px 0;font-size:13px}
+.pie button{background:none;border:0;padding:0;font:inherit;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.dias{margin:22px 0 0}
+.dias h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 22px 10px}
+.tira{display:flex;gap:10px;overflow-x:auto;padding:4px 18px 8px;scroll-snap-type:x proximity;scrollbar-width:none}
+.tira::-webkit-scrollbar{display:none}
+.dia{flex:none;width:76px;height:76px;border-radius:50%;border:1px solid var(--glass-b);background:var(--glass);color:var(--ink);font:inherit;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;scroll-snap-align:start;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:background-color .3s ease,border-color 1.4s ease}
+.dia small{font-size:11px;font-weight:600;text-transform:capitalize;color:var(--muted)}
+.dia b{font-family:var(--display);font-size:24px;font-weight:800}
+.dia[aria-pressed="true"]{background:var(--dark);border-color:var(--dark);color:var(--on-dark)}
+.dia[aria-pressed="true"] small{color:var(--on-dark)}
+.detalle{margin:6px 18px 0;padding:12px 16px;border-radius:22px;background:var(--glass-2);border:1px solid var(--glass-b);font-size:14px}
+.detalle li{padding:5px 0}
+.detalle li+li{border-top:1px solid var(--glass-b)}
+
+.barra{position:fixed;left:0;right:0;bottom:14px;z-index:5;display:flex;justify-content:center;pointer-events:none}
+.barra form{pointer-events:auto;width:min(416px,calc(100% - 24px));display:flex;gap:8px;align-items:center;padding:7px 7px 7px 20px;border-radius:99px;
+  background:var(--glass);border:1px solid var(--glass-b);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:0 14px 34px -14px rgba(40,15,0,.55);transition:background-color 1.4s ease,border-color 1.4s ease}
+.barra input{flex:1;min-width:0;height:46px;border:0;background:transparent;color:var(--ink);font:inherit;font-weight:500}
+.barra input:focus{outline:none}
+.barra form:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+.barra input::placeholder{color:var(--muted)}
+.add{flex:none;width:52px;height:46px;border-radius:99px;border:0;background:var(--accent);color:var(--on-accent);font-size:26px;line-height:1;cursor:pointer;font-weight:500}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#avisoGuardado{margin:10px 22px 0}
+
+/* gato */
+#grande{font-family:var(--display);font-weight:800;letter-spacing:-.03em;fill:var(--titulo);opacity:var(--titulo-o)}
+#despierto,#dormido{transition:opacity 1.2s ease,transform 1.6s cubic-bezier(.3,0,.2,1)}
+#dormido{transform-origin:50% 100%}
+.ojos{transform-box:fill-box;transform-origin:50% 50%;animation:parpadeo 6s infinite}
+.cabeza{transform-box:fill-box;transform-origin:50% 100%;animation:ladea 7s ease-in-out infinite}
+.purr{animation:purr .12s linear infinite}
+.cola{transform-box:fill-box;transform-origin:80% 0%;animation:cola 3.8s ease-in-out infinite}
+.prr{animation:prr 2.4s ease-in-out infinite}
+.prr text{font-family:var(--display);font-weight:800;fill:#fff3d6}
+@keyframes purr{0%,100%{transform:translateY(0)}50%{transform:translateY(.8px)}}
+@keyframes cola{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(4deg)}}
+@keyframes prr{0%,100%{opacity:.25}50%{opacity:.95}}
+.respira{transform-box:fill-box;transform-origin:50% 100%;animation:respira 4.4s ease-in-out infinite}
+.zz text{font-family:var(--display);font-weight:800;fill:#fff3d6;opacity:0;animation:zz 4.4s ease-in-out infinite}
+.zz text:nth-child(2){animation-delay:1.45s}.zz text:nth-child(3){animation-delay:2.9s}
+@keyframes parpadeo{0%,93%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.1)}}
+@keyframes ladea{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+@keyframes respira{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.05)}}
+@keyframes zz{0%{opacity:0;transform:translate(0,0)}30%{opacity:.9}100%{opacity:0;transform:translate(14px,-34px)}}
+@media (prefers-reduced-motion:reduce){
+  .ojos,.cabeza,.respira,.zz text,.purr,.cola,.prr{animation:none}.zz text{opacity:.8}
+  #despierto,#dormido,.escena svg *,body,body::before,.hoja,.chip,.barra form{transition:none}
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="escena" id="escena">
+    <svg viewBox="0 0 400 500" aria-hidden="true">
+      <defs>
+        <radialGradient id="vin" cx="50%" cy="45%" r="75%"><stop offset=".45" stop-color="#3a1604" stop-opacity="0"/><stop offset="1" stop-color="#3a1604" stop-opacity="1"/></radialGradient>
+        <pattern id="pana" width="9" height="9" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="3" height="9" style="fill:var(--pana)" opacity=".55"/></pattern>
+      </defs>
+      <rect width="400" height="500" style="fill:var(--wall)"/>
+      <g transform="translate(0,70)">
+        <g style="fill:var(--luz)">
+          <path d="M122 58 L214 36 L214 196 L122 222 Z"/>
+          <path d="M246 74 Q300 4 372 44 L372 190 L246 228 Z"/>
+        </g>
+        <g style="stroke:var(--wall)" stroke-width="7" fill="none">
+          <path d="M168 46 L168 210"/><path d="M122 138 L214 114"/>
+          <path d="M308 40 L308 210"/><path d="M246 150 L372 116"/>
+        </g>
+      </g>
+      <rect x="0" y="0" width="58" height="500" style="fill:var(--cortina)"/>
+      <g style="stroke:var(--pliegue)" stroke-width="3" fill="none" stroke-linecap="round"><path d="M13 0 C9 170 17 340 11 500"/><path d="M32 0 C38 180 28 340 34 500"/><path d="M50 0 C46 160 54 330 48 500"/></g>
+      <text id="grande" x="212" y="118" text-anchor="middle" font-size="84">···</text>
+      <g transform="translate(0,60)">
+        <rect x="296" y="232" width="92" height="8" rx="4" style="fill:var(--madera)"/>
+        <path d="M330 232 L334 206 L358 206 L362 232 Z" fill="#efe6d6"/>
+        <g style="fill:var(--hoja)"><path d="M346 206 C332 190 330 170 338 158 C348 172 350 190 346 206 Z"/><path d="M346 206 C356 188 368 180 380 180 C376 196 364 204 346 206 Z"/><path d="M346 206 C340 192 326 186 314 188 C320 200 332 206 346 206 Z"/></g>
+
+        <!-- GATO DESPIERTO: tumbado en el sofá, ronroneando -->
+        <g id="despierto">
+          <rect x="-10" y="268" width="420" height="200" rx="36" style="fill:var(--pana)"/>
+          <path d="M-10 372 C80 360 320 360 410 372 L410 442 L-10 442 Z" style="fill:var(--sofa)"/>
+          <path d="M-10 372 C80 360 320 360 410 372 L410 442 L-10 442 Z" fill="url(#pana)"/>
+          <rect x="342" y="298" width="90" height="160" rx="32" style="fill:var(--sofa)"/>
+          <path d="M356 318 q14 -10 30 -6" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
+          <g transform="rotate(-11 56 330)"><rect x="16" y="292" width="80" height="76" rx="18" fill="#ffd67e"/><path d="M30 310 h52 M30 330 h52 M30 350 h52" stroke="#e9b44e" stroke-width="4" stroke-linecap="round"/></g>
+          <g class="purr">
+            <ellipse cx="232" cy="379" rx="130" ry="9" fill="#3a1604" opacity=".22"/>
+            <g class="cola">
+              <path d="M330 350 C384 364 358 400 268 391" fill="none" stroke="#e58a40" stroke-width="19" stroke-linecap="round"/>
+              <path d="M352 372 l10 12 M330 384 l6 13 M306 388 l3 13" stroke="#c96b28" stroke-width="6" stroke-linecap="round"/>
+              <path d="M284 392 C278 392 273 391.5 268 391" fill="none" stroke="#fbdcb4" stroke-width="19" stroke-linecap="round"/>
+            </g>
+            <ellipse cx="318" cy="373" rx="30" ry="12" fill="#f4ad68"/>
+            <g class="respira">
+              <path d="M150 374 C116 372 108 330 138 304 C170 274 252 258 304 274 C356 290 370 342 342 366 C332 375 318 377 300 377 Z" fill="#e58a40"/>
+              <ellipse cx="304" cy="326" rx="54" ry="47" fill="#ea9347"/>
+              <path d="M256 372 C262 350 282 338 306 340" fill="none" stroke="#cf7430" stroke-width="5" stroke-linecap="round"/>
+              <g stroke="#c96b28" stroke-width="8" stroke-linecap="round" fill="none"><path d="M214 270 q10 20 2 42"/><path d="M246 264 q11 22 3 48"/><path d="M278 266 q11 22 1 46"/><path d="M310 276 q9 18 -1 38"/><path d="M338 296 q6 14 -3 28"/></g>
+            </g>
+            <ellipse cx="152" cy="348" rx="36" ry="31" fill="#f6c690"/>
+            <rect x="116" y="353" width="88" height="25" rx="12.5" fill="#ee9b52"/>
+            <path d="M176 356 v9 M188 357 v8" stroke="#cf7430" stroke-width="4" stroke-linecap="round"/>
+            <rect x="82" y="360" width="96" height="27" rx="13.5" fill="#f4ad68"/>
+            <path d="M94 370 v10 M105 369 v12 M116 370 v10" stroke="#c9712f" stroke-width="3" stroke-linecap="round"/>
+            <path d="M150 363 v9 M162 364 v8" stroke="#cf7430" stroke-width="4" stroke-linecap="round"/>
+            <g class="cabeza">
+              <path d="M100 278 L90 224 L136 256 Z" fill="#e58a40"/><path d="M184 278 L194 224 L148 256 Z" fill="#e58a40"/>
+              <path d="M106 268 L101 240 L126 257 Z" fill="#f2b08c"/><path d="M178 268 L183 240 L158 257 Z" fill="#f2b08c"/>
+              <path d="M92 302 l-14 9 l18 5 Z" fill="#ee9b52"/><path d="M192 302 l14 9 l-18 5 Z" fill="#ee9b52"/>
+              <ellipse cx="142" cy="296" rx="53" ry="45" fill="#ee9b52"/>
+              <g stroke="#cf7430" stroke-width="5" stroke-linecap="round" fill="none"><path d="M142 254 v15"/><path d="M129 257 l3 13"/><path d="M155 257 l-3 13"/><path d="M92 292 h13"/><path d="M192 292 h-13"/><path d="M95 303 h10"/><path d="M189 303 h-10"/></g>
+              <ellipse cx="142" cy="315" rx="28" ry="19" fill="#fbdcb4"/>
+              <g id="ojosP" style="transform-box:fill-box;transform-origin:50% 50%;transition:transform .8s ease"><g class="ojos">
+                <ellipse cx="121" cy="292" rx="10.5" ry="8" fill="#e9b53c"/><ellipse cx="121" cy="292" rx="3.2" ry="7" fill="#2a1a0d"/><circle cx="123.6" cy="289" r="1.7" fill="#fff"/>
+                <ellipse cx="163" cy="292" rx="10.5" ry="8" fill="#e9b53c"/><ellipse cx="163" cy="292" rx="3.2" ry="7" fill="#2a1a0d"/><circle cx="165.6" cy="289" r="1.7" fill="#fff"/>
+              </g></g>
+              <path d="M108 288 q13 -10 26 -1 M150 287 q13 -9 26 1" fill="none" stroke="#7a4517" stroke-width="3" stroke-linecap="round"/>
+              <path d="M136 304 L148 304 L142 311 Z" fill="#d86a56"/>
+              <path d="M142 311 q-7 9 -15 3 M142 311 q7 9 15 3" fill="none" stroke="#a8552a" stroke-width="2.5" stroke-linecap="round"/>
+              <g stroke="#fff8ea" stroke-width="1.6" stroke-linecap="round" opacity=".9"><path d="M118 314 L66 304"/><path d="M118 320 L64 324"/><path d="M166 314 L218 304"/><path d="M166 320 L220 324"/></g>
+            </g>
+          </g>
+          <g class="prr"><text x="222" y="250" font-size="22" transform="rotate(-8 222 250)">prrr</text>
+            <path d="M214 262 q7 -7 14 0 t14 0 t14 0" fill="none" stroke="#fff3d6" stroke-width="3" stroke-linecap="round"/></g>
+        </g>
+
+        <!-- GATO DORMIDO: primer plano, arropado -->
+        <g id="dormido" style="opacity:0">
+          <path d="M0 300 C90 270 310 270 400 300 L400 442 L0 442 Z" style="fill:var(--sofa)"/>
+          <path d="M0 300 C90 270 310 270 400 300 L400 442 L0 442 Z" fill="url(#pana)"/>
+          <path d="M-10 306 C36 232 118 200 200 214 C286 196 368 236 410 300 L410 442 L-10 442 Z" fill="#fff4e2"/>
+          <g fill="none" stroke="#e3c79c" stroke-width="3.5" stroke-linecap="round"><path d="M34 292 C76 250 128 236 168 240"/><path d="M246 230 C298 234 348 262 380 300"/><path d="M14 344 C44 322 66 318 86 330"/><path d="M330 318 C352 312 372 320 392 340"/></g>
+          <path d="M112 288 L98 196 L178 246 Z" fill="#e58a40"/><path d="M288 288 L302 196 L222 246 Z" fill="#e58a40"/>
+          <path d="M124 270 L116 222 L160 250 Z" fill="#f2b08c"/><path d="M276 270 L284 222 L240 250 Z" fill="#f2b08c"/>
+          <ellipse cx="200" cy="320" rx="106" ry="84" fill="#ee9b52"/>
+          <g stroke="#cf7430" stroke-width="7" stroke-linecap="round" fill="none"><path d="M200 242 v26"/><path d="M178 246 l4 24"/><path d="M222 246 l-4 24"/><path d="M102 312 h22"/><path d="M298 312 h-22"/><path d="M106 332 h18"/><path d="M294 332 h-18"/></g>
+          <ellipse cx="200" cy="358" rx="54" ry="36" fill="#fbdcb4"/>
+          <g fill="none" stroke="#5a391b" stroke-width="5" stroke-linecap="round"><path d="M138 318 q21 13 42 0"/><path d="M220 318 q21 13 42 0"/></g>
+          <path d="M190 338 L210 338 L200 350 Z" fill="#e07a78"/>
+          <path d="M200 350 q-10 12 -23 4 M200 350 q10 12 23 4" fill="none" stroke="#a8552a" stroke-width="3" stroke-linecap="round"/>
+          <g stroke="#fff8ea" stroke-width="2" stroke-linecap="round" opacity=".95"><path d="M158 358 L84 340"/><path d="M158 366 L80 370"/><path d="M242 358 L316 340"/><path d="M242 366 L320 370"/></g>
+          <path d="M-10 300 C32 292 82 312 98 376 L-10 410 Z" fill="#fff4e2"/><path d="M410 300 C368 292 318 312 302 376 L410 410 Z" fill="#fff4e2"/>
+          <g class="respira">
+            <path d="M-10 442 L-10 372 C40 350 92 372 142 386 C182 396 216 390 252 381 C302 368 352 350 410 366 L410 442 Z" fill="#fffaf1"/>
+            <g fill="none" stroke="#e3c79c" stroke-width="3.5" stroke-linecap="round"><path d="M58 374 C100 394 142 406 192 402"/><path d="M242 394 C292 390 332 374 374 368"/><path d="M118 424 C180 434 242 432 304 416"/></g>
+          </g>
+          <g class="zz"><text x="300" y="214" font-size="22">z</text><text x="322" y="184" font-size="28">z</text><text x="348" y="150" font-size="36">z</text></g>
+        </g>
+      </g>
+      <rect width="400" height="500" fill="url(#vin)" style="opacity:var(--vin)" pointer-events="none"/>
+    </svg>
+    <span class="chip" id="fecha"></span>
+  </div>
+
+  <section class="hoja" aria-live="polite">
+    <p id="sub">Un momento.</p>
+    <div class="seg" id="seg" aria-hidden="true"></div>
+    <ul id="lista"></ul>
+    <p class="vacio" id="vacio" hidden>No hay nada apuntado para hoy.</p>
+    <div id="avisoCal" hidden></div>
+  </section>
+  <p class="vacio" id="avisoGuardado" hidden></p>
+
+  <section class="dias" id="secSig" hidden>
+    <h2>Lo demás ya tiene su día</h2>
+    <div class="tira" id="tira"></div>
+    <ul class="detalle" id="detalle" hidden></ul>
+  </section>
+  <p class="pie" id="pie" hidden><button type="button" id="desconectar">Desconectar el calendario de este móvil</button></p>
+</main>
+
+<div class="barra">
+  <form id="form" autocomplete="off">
+    <input type="text" id="nueva" maxlength="120" placeholder="Añadir algo para hoy" aria-label="Añadir algo para hoy">
+    <button class="add" type="submit" aria-label="Añadir">+</button>
+  </form>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id)};
+  var pad=function(n){return String(n).padStart(2,"0")};
+  var dayKey=function(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
+  var addDays=function(k,n){var p=k.split("-").map(Number);return dayKey(new Date(p[0],p[1]-1,p[2]+n))};
+  var keyDate=function(k){var p=k.split("-").map(Number);return new Date(p[0],p[1]-1,p[2])};
+  var clone=function(o){return JSON.parse(JSON.stringify(o))};
+  var LS="gato-sofa-estado";
+  var COLORES=["#ffd67e","#f6b88a","#efe3cd","#cdd7ab","#f3a78d"];
+
+  var today=dayKey(new Date());
+  var S={manual:[],cal:{}};          // lo que se guarda
+  var E=null;                        // eventos del calendario (null = aún no)
+  var calError=null, diaSel=null;
+  var mcp=null, ref=null, unsubCal=null, writing=false, dirty=false;
+
+  try{var raw=localStorage.getItem(LS); if(raw){var o=JSON.parse(raw); if(o&&Array.isArray(o.manual)) S={manual:o.manual,cal:o.cal||{}};}}catch(e){}
+
+  function evDay(ev){
+    var s=ev.start||{}, e=ev.end||{};
+    if(s.date) return {start:s.date,end:e.date||addDays(s.date,1),time:""};
+    if(s.dateTime){var d=new Date(s.dateTime); if(isNaN(d)) return null;
+      return {start:dayKey(d),end:addDays(dayKey(d),1),time:pad(d.getHours())+":"+pad(d.getMinutes())};}
+    return null;
+  }
+  function itemsHoy(){
+    var out=[];
+    (E||[]).forEach(function(ev){
+      var d=evDay(ev); if(!d) return;
+      if(d.start<=today && today<d.end){
+        var k=String(ev.id)+"@"+today;
+        out.push({tipo:"cal",key:k,titulo:String(ev.summary||"(sin título)"),hora:d.time,estado:S.cal[k]||""});
+      }
+    });
+    S.manual.forEach(function(m){
+      var desde=m.desde||m.added||today;
+      if(desde>today) return;
+      if(m.done && m.done!==today) return;
+      out.push({tipo:"mio",key:m.id,titulo:String(m.t||""),hora:"",estado:m.done===today?"ok":""});
+    });
+    return out;
+  }
+
+  function el(tag,cls,txt){var n=document.createElement(tag); if(cls) n.className=cls; if(txt!=null) n.textContent=txt; return n}
+  function pillBtn(txt,fn){var b=el("button","pill",txt); b.type="button"; b.addEventListener("click",fn); return b}
+
+  function render(){
+    var items=itemsHoy();
+    var total=items.length, hechos=items.filter(function(i){return i.estado}).length;
+    var cargando=(E===null && !calError);
+    var cerrado=!cargando && hechos===total;
+    document.documentElement.setAttribute("data-estado",cerrado?"cerrado":"abierto");
+
+    // gato: despierto mira desde arriba y se le van cerrando los ojos; dormido, en primer plano
+    var prog= total? hechos/total : 0;
+    $("ojosP").style.transform="scaleY("+(1-.5*prog).toFixed(2)+")";
+    $("despierto").style.opacity=cerrado?"0":"1";
+    var z=$("dormido"); z.style.opacity=cerrado?"1":"0"; z.style.transform=cerrado?"scale(1)":"scale(.86)";
+
+    var g=$("grande"), sub=$("sub"), q=total-hechos;
+    if(cargando){g.textContent="···";sub.textContent="Mirando el día. Un momento.";}
+    else if(cerrado && total===0){g.textContent="Libre";sub.textContent="Hoy no hay nada. El sofá es tuyo.";}
+    else if(cerrado){g.textContent="Cerrado";sub.textContent="Hoy está hecho. Puedes tumbarte.";}
+    else{g.textContent=(q===1?"Queda ":"Quedan ")+q;
+      sub.textContent=hechos? "Llevas "+hechos+" de "+total+". Al gato ya se le cierran los ojos." : (total===1?"Una cosa para hoy. Nada más.":total+" cosas para hoy. Nada más.");}
+    g.setAttribute("font-size",g.textContent.length>=7?"76":"96");
+
+    var seg=$("seg"); seg.textContent="";
+    for(var i=0;i<total;i++){seg.appendChild(el("span",i<hechos?"on":""))}
+    seg.hidden=total===0;
+
+    var ul=$("lista"); ul.textContent="";
+    var pend=items.filter(function(i){return !i.estado}), ok=items.filter(function(i){return i.estado});
+    pend.forEach(function(it,n){
+      var li=el("li","t"); li.style.background=COLORES[n%COLORES.length]; li.style.zIndex=String(n+1);
+      var tx=el("div","txt"); tx.appendChild(el("div","tit",it.titulo));
+      var p=el("div","pills");
+      p.appendChild(el("span","pill",it.tipo==="cal"?(it.hora?"Calendario · "+it.hora:"Calendario"):"Tuyo"));
+      if(it.tipo==="cal") p.appendChild(pillBtn("Hoy no me toca",function(){S.cal[it.key]="no";save();render()}));
+      else{p.appendChild(pillBtn("Mañana",function(){var x=buscar(it.key);if(x){x.desde=addDays(today,1);save();render()}}));
+           p.appendChild(pillBtn("Quitar",function(){S.manual=S.manual.filter(function(x){return x.id!==it.key});save();render()}));}
+      tx.appendChild(p);
+      var b=el("button","tic","✓"); b.type="button"; b.setAttribute("aria-pressed","false"); b.setAttribute("aria-label","Marcar como hecho: "+it.titulo);
+      b.addEventListener("click",function(){toggle(it)});
+      li.appendChild(tx); li.appendChild(b); ul.appendChild(li);
+    });
+    ok.forEach(function(it){
+      var li=el("li","t hecho");
+      var tx=el("div","txt"); tx.appendChild(el("div","tit",it.titulo));
+      if(it.estado==="no") tx.appendChild(el("div","nota","Hoy no me toca"));
+      var b=el("button","tic","✓"); b.type="button"; b.setAttribute("aria-pressed","true"); b.setAttribute("aria-label","Desmarcar: "+it.titulo);
+      b.addEventListener("click",function(){toggle(it)});
+      li.appendChild(tx); li.appendChild(b); ul.appendChild(li);
+    });
+    $("vacio").hidden= total>0 || cargando;
+
+    renderDias(); renderAvisoCal();
+  }
+
+  function renderDias(){
+    var porDia={}, orden=[];
+    (E||[]).forEach(function(ev){var d=evDay(ev); if(!d||d.start<=today) return;
+      if(!porDia[d.start]){porDia[d.start]=[];orden.push(d.start)} porDia[d.start].push(String(ev.summary||"(sin título)"));});
+    orden.sort(); orden=orden.slice(0,8);
+    var tira=$("tira"); tira.textContent="";
+    var fd=new Intl.DateTimeFormat("es-ES",{weekday:"short"});
+    orden.forEach(function(k){
+      var b=el("button","dia"); b.type="button"; b.setAttribute("aria-pressed",diaSel===k?"true":"false");
+      var n=porDia[k].length;
+      b.appendChild(el("small",null,fd.format(keyDate(k)).replace(/\./g,"")));
+      b.appendChild(el("b",null,String(keyDate(k).getDate())));
+      b.appendChild(el("small",null,n===1?"1 cosa":n+" cosas"));
+      b.addEventListener("click",function(){diaSel=diaSel===k?null:k;renderDias()});
+      tira.appendChild(b);
+    });
+    $("secSig").hidden=orden.length===0;
+    var det=$("detalle"); det.textContent="";
+    if(diaSel&&porDia[diaSel]){porDia[diaSel].forEach(function(t){det.appendChild(el("li",null,t))}); det.hidden=false;} else det.hidden=true;
+  }
+
+  function buscar(id){for(var i=0;i<S.manual.length;i++) if(S.manual[i].id===id) return S.manual[i]; return null}
+  function toggle(it){
+    if(it.tipo==="cal"){ if(S.cal[it.key]) delete S.cal[it.key]; else S.cal[it.key]="ok"; }
+    else{var m=buscar(it.key); if(m) m.done = m.done===today? null : today;}
+    save(); render();
+  }
+
+  function podar(){
+    var lim=addDays(today,-7);
+    Object.keys(S.cal).forEach(function(k){var d=k.slice(k.lastIndexOf("@")+1); if(d<lim) delete S.cal[k]});
+    S.manual=S.manual.filter(function(m){return !(m.done && m.done<lim)});
+  }
+  function avisoG(t){var a=$("avisoGuardado"); a.hidden=!t; a.textContent=t||""}
+  function save(){
+    podar();
+    try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
+    if(API){apiSave();return}
+    if(!ref) return;
+    if(writing){dirty=true;return}
+    writing=true;
+    (function loop(){
+      dirty=false;
+      ref.set(clone(S)).then(function(){ if(dirty) loop(); else{writing=false; avisoG("");} },
+        function(err){writing=false;
+          avisoG((err&&err.code==="quota_exceeded")?"No queda espacio para guardar. Quita tareas antiguas.":"No se ha podido guardar este cambio en la nube. Sigue apuntado en este dispositivo.");});
+    })();
+  }
+
+  $("form").addEventListener("submit",function(ev){
+    ev.preventDefault(); var i=$("nueva"), t=i.value.trim(); if(!t) return;
+    S.manual.push({id:"m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),t:t,added:today,done:null});
+    i.value=""; save(); render();
+  });
+
+  // --- calendario
+  var CAL="Google Calendar", TOOL="list_events";
+  function calInput(){return {startTime:today+"T00:00:00",endTime:addDays(today,14)+"T00:00:00",orderBy:"startTime",pageSize:80}}
+  function leerPayload(res){
+    var p=res&&res.payload; if(typeof p==="string"){try{p=JSON.parse(p)}catch(e){p=null}}
+    var evs=p&&Array.isArray(p.events)?p.events:[];
+    return evs.filter(function(e){return e&&e.status!=="cancelled"});
+  }
+  function watchCal(){
+    if(!mcp) return; if(unsubCal){unsubCal();unsubCal=null}
+    unsubCal=mcp.watchTool(CAL,TOOL,calInput(),function(ev){
+      if(ev.type==="data"){E=leerPayload(ev.result);calError=null;}
+      else{var code=ev.error&&ev.error.code||"upstream_error"; calError=code;
+        if(["needs_reauth","server_not_connected","blocked_by_policy","approval_required","not_in_manifest","selection_required","consent_required"].indexOf(code)>=0){E=[];}
+        else if(E===null) E=[];}
+      render();
+    },{cache:{staleTime:300000,gcTime:86400000},refetchInterval:600000});
+  }
+  function renderAvisoCal(){
+    var box=$("avisoCal"); box.textContent="";
+    var msg="", btn=false;
+    if(SOLO && !API){renderConecta(box);return}
+    if(SOLO){ if(calError) msg="No llego a tu calendario ahora mismo. Se vuelve a intentar al abrir la app."; }
+    else if(mcp===false) msg="Aquí no puedo leer tu calendario. Lo que añadas a mano funciona igual.";
+    else if(calError==="needs_reauth") msg="Google Calendar ha caducado. Vuelve a conectarlo en Claude, en Ajustes → Conectores.";
+    else if(calError==="server_not_connected"||calError==="selection_required") msg="No encuentro Google Calendar. Añádelo en Claude, en Ajustes → Conectores.";
+    else if(calError==="approval_required"||calError==="consent_required"){msg="Falta tu permiso para leer el calendario.";btn=true;}
+    else if(calError==="not_in_manifest"||calError==="blocked_by_policy") msg="Esta página no tiene permiso para leer el calendario. Lo que añadas a mano funciona igual.";
+    else if(calError) msg="El calendario no responde ahora mismo. Se vuelve a intentar solo.";
+    box.hidden=!msg; if(!msg) return;
+    var p=el("div","aviso"); p.appendChild(el("div",null,msg));
+    if(btn){var b=el("button",null,"Permitir leer el calendario"); b.type="button";
+      b.addEventListener("click",function(){b.disabled=true;
+        mcp.callTool(CAL,TOOL,calInput()).then(function(r){E=leerPayload(r);calError=null;render()},function(){b.disabled=false})});
+      p.appendChild(b);}
+    box.appendChild(p);
+  }
+
+  function tick(){
+    $("fecha").textContent=new Intl.DateTimeFormat("es-ES",{weekday:"long",day:"numeric",month:"short"}).format(new Date()).replace(/\./g,"");
+    var k=dayKey(new Date()); if(k!==today){today=k; diaSel=null; watchCal(); apiLoad(); render();}
+  }
+  setInterval(tick,60000);
+  document.addEventListener("visibilitychange",function(){if(!document.hidden){tick();apiLoad()}});
+  setInterval(function(){if(!document.hidden) apiLoad()},300000);
+
+  // --- versión instalada en el móvil: calendario y tics a través de tu script de Google
+  var SOLO=!(window.claude&&window.claude.use);
+  var API=null, apiPend=false, apiTimer=null, apiBusy=false;
+  var RE=/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/;
+  try{API=localStorage.getItem("gato-api")||null; apiPend=localStorage.getItem("gato-pend")==="1";}catch(e){}
+  if(!SOLO) API=null;
+  function setPend(v){apiPend=v; try{localStorage.setItem("gato-pend",v?"1":"0")}catch(e){}}
+  function leerApi(url){return fetch(url+"?from="+today+"&days=14").then(function(r){return r.json()}).then(function(j){if(!j||!j.ok) throw new Error("x"); return j})}
+  function aplicarApi(j){
+    E=Array.isArray(j.events)?j.events:[]; calError=null;
+    try{localStorage.setItem("gato-ev",JSON.stringify({d:today,e:E}))}catch(e){}
+    if(!apiPend && j.state && Array.isArray(j.state.manual)){S={manual:j.state.manual,cal:j.state.cal||{}}; try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+    render();
+  }
+  function apiLoad(){ if(!API) return; leerApi(API).then(aplicarApi,function(){calError="red"; if(E===null)E=[]; render()}) }
+  function apiSave(){
+    setPend(true); clearTimeout(apiTimer);
+    apiTimer=setTimeout(function enviar(){
+      if(apiBusy){apiTimer=setTimeout(enviar,400);return}
+      apiBusy=true; var foto=JSON.stringify({state:S});
+      fetch(API,{method:"POST",body:foto}).then(function(r){return r.json()}).then(function(){
+        apiBusy=false; if(JSON.stringify({state:S})===foto){setPend(false);avisoG("")}
+      },function(){apiBusy=false; avisoG("Sin conexión: el cambio se queda en este móvil y se envía la próxima vez.")});
+    },500);
+  }
+  function renderConecta(box){
+    box.hidden=false;
+    var p=el("div","aviso conecta"); p.appendChild(el("div",null,"Conecta tu calendario: pega aquí el enlace de tu script de Google."));
+    var i=el("input"); i.type="url"; i.id="enlace"; i.placeholder="https://script.google.com/macros/s/…/exec"; i.setAttribute("aria-label","Enlace del script");
+    var m=el("div"); m.style.marginTop="6px";
+    var b=el("button",null,"Conectar"); b.type="button";
+    b.addEventListener("click",function(){
+      var u=i.value.trim();
+      if(!RE.test(u)){m.textContent="Ese enlace no parece el del script. Tiene que empezar por https://script.google.com/macros/s/ y acabar en /exec.";return}
+      b.disabled=true; m.textContent="Probando…";
+      leerApi(u).then(function(j){API=u; try{localStorage.setItem("gato-api",u)}catch(e){} $("pie").hidden=false; aplicarApi(j); if(S.manual.length||Object.keys(S.cal).length) apiSave();},
+        function(){b.disabled=false; m.textContent="El enlace no responde. Revisa que en la implementación el acceso sea «Cualquier usuario».";});
+    });
+    p.appendChild(i); p.appendChild(b); p.appendChild(m); box.appendChild(p);
+  }
+  $("desconectar").addEventListener("click",function(){API=null; try{localStorage.removeItem("gato-api");localStorage.removeItem("gato-ev")}catch(e){} E=[]; calError=null; $("pie").hidden=true; render();});
+
+  // --- ronroneo al tocar al gato
+  var actx=null;
+  $("escena").addEventListener("click",function(){
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return; actx=actx||new AC(); if(actx.state==="suspended") actx.resume();
+      var t=actx.currentTime, d=2.8, n=Math.floor(actx.sampleRate*d), buf=actx.createBuffer(1,n,actx.sampleRate), ch=buf.getChannelData(0), last=0;
+      for(var k=0;k<n;k++){var w=Math.random()*2-1; last=(last+0.02*w)/1.02; ch[k]=last*3.5;}
+      var src=actx.createBufferSource(); src.buffer=buf;
+      var lp=actx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=240;
+      var trem=actx.createGain(); trem.gain.value=.55;
+      var lfo=actx.createOscillator(); lfo.type="sawtooth"; lfo.frequency.value=24; var lg=actx.createGain(); lg.gain.value=.45;
+      var env=actx.createGain(); env.gain.setValueAtTime(0,t); env.gain.linearRampToValueAtTime(.9,t+.4); env.gain.linearRampToValueAtTime(0,t+d);
+      lfo.connect(lg); lg.connect(trem.gain); src.connect(lp); lp.connect(trem); trem.connect(env); env.connect(actx.destination);
+      src.start(t); lfo.start(t); lfo.stop(t+d);
+    }catch(e){}
+  });
+
+  tick();
+  if(SOLO){
+    mcp=false;
+    if(API){
+      $("pie").hidden=false;
+      try{var c=JSON.parse(localStorage.getItem("gato-ev")||"null"); if(c&&c.d===today&&Array.isArray(c.e)) E=c.e;}catch(e){}
+      render(); if(apiPend) apiSave(); apiLoad();
+    } else { E=[]; render(); }
+    return;
+  }
+  render();
+  var use=window.claude.use.bind(window.claude);
+
+  use("mcp").then(function(m){ if(m){mcp=m;watchCal();} else{mcp=false;E=[];render();} },function(){mcp=false;E=[];render()});
+
+  use("db").then(function(db){
+    if(!db){ avisoG("Los tics se guardan solo en este dispositivo."); return; }
+    ref=db.doc("sofa/estado");
+    var t=setTimeout(function(){ avisoG("Aún no llego a los datos guardados. Lo que ves puede no estar al día."); },10000);
+    ref.onSnapshot(function(snap){
+      if(!snap.metadata.fromCache){clearTimeout(t); if(!writing) avisoG("");}
+      if(snap.metadata.hasPendingWrites||writing) return;
+      if(snap.exists){var d=snap.data()||{};
+        S={manual:Array.isArray(d.manual)?clone(d.manual):[], cal:(d.cal&&typeof d.cal==="object")?clone(d.cal):{}};
+        try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
+        render();}
+    },function(){clearTimeout(t); ref=null; avisoG("No puedo guardar en la nube ahora. Los tics se quedan en este dispositivo.");});
+  },function(){});
+})();
+</script>
+</body>
+</html>
