@@ -12,6 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="Gato">
 <meta name="theme-color" content="#e6d8bf">
 <meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -24,33 +25,35 @@
   --glass:rgba(255,255,255,.46); --glass-b:rgba(255,255,255,.75); --glass-2:rgba(255,255,255,.3);
   --accent:#ffd05e; --on-accent:#26170d; --dark:#26170d; --on-dark:#fff3df;
   --wall:#e6d8bf; --luz:#fff6dc; --cortina:#f5eedd; --pliegue:#e2d6bd; --madera:#8a5a36; --hoja:#5d7a4f;
-  --sofa:#b4532e; --pana:#96421f; --vin:0; --titulo:#ffffff; --titulo-o:.85;
+  --sofa:#b4532e; --pana:#96421f; --vin:0; --noche:0; --titulo:#ffffff; --titulo-o:.85;
   --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
   --body:"Instrument Sans","Helvetica Neue",system-ui,sans-serif;
 }
 :root[data-estado="cerrado"]{
   color-scheme: dark;
-  --bg1:#c2812f; --ink:#fff3df; --muted:#dcc3a4;
-  --glass:rgba(255,236,210,.13); --glass-b:rgba(255,230,200,.26); --glass-2:rgba(255,236,210,.08);
-  --dark:#fff3df; --on-dark:#26170d;
-  --wall:#c2812f; --luz:#ffd67e; --cortina:#dfae5f; --pliegue:#c4914a; --madera:#5a351d; --hoja:#4c5a2c;
-  --sofa:#8a3a1c; --pana:#6d2b12; --vin:.5; --titulo:#fff0c9; --titulo-o:.9;
+  --bg1:#4a4c5c; --ink:#eef1fb; --muted:#aeb7d1;
+  --glass:rgba(200,215,255,.11); --glass-b:rgba(200,215,255,.24); --glass-2:rgba(200,215,255,.06);
+  --dark:#eef1fb; --on-dark:#141a2e;
+  --vin:.5; --noche:.66; --titulo:#f1f4ff; --titulo-o:.92;
 }
 *{box-sizing:border-box}
-html,body{margin:0}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
 body{background:linear-gradient(180deg,#e6d8bf 0,#e6d8bf 320px,#f0dcc0 640px,#e7bf98 100%) fixed;color:var(--ink);
-  font-family:var(--body);font-size:16px;line-height:1.4;transition:color 1.4s ease;-webkit-font-smoothing:antialiased;min-height:100vh}
+  font-family:var(--body);font-size:16px;line-height:1.4;transition:color 1.4s ease;-webkit-font-smoothing:antialiased;}
 body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:0;transition:opacity 1.4s ease;
-  background:linear-gradient(180deg,#c2812f 0,#c2812f 300px,#6b3116 620px,#1c100b 100%)}
+  background:linear-gradient(180deg,#646a8a 0,#4a5174 300px,#1d2340 620px,#0b0f20 100%)}
 :root[data-estado="cerrado"] body::before{opacity:1}
-main{max-width:440px;margin:0 auto;padding:0 0 110px;position:relative}
+main{max-width:440px;margin:0 auto;height:100%;position:relative;display:flex;flex-direction:column}
+.scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin-top:-64px;padding:22px 0 110px;position:relative;z-index:2;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 22px);mask-image:linear-gradient(to bottom,transparent 0,#000 22px)}
+.scroll::-webkit-scrollbar{display:none}
 
-.escena{position:relative;cursor:pointer}
-.escena svg{display:block;width:100%;height:auto}
+.escena{position:relative;cursor:pointer;flex:none}
+.escena svg{display:block;width:100%;height:min(125vw,550px,58vh)}
 .escena svg *{transition:fill 1.4s ease,stroke 1.4s ease,opacity 1.2s ease}
 .chip{position:absolute;top:18px;left:0;right:0;text-align:center;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.75;transition:color 1.4s ease}
 
-.hoja{position:relative;margin:-34px 10px 0;padding:18px 12px 14px;border-radius:34px;background:var(--glass);border:1px solid var(--glass-b);
+.hoja{position:relative;margin:0 10px;padding:18px 12px 14px;border-radius:34px;background:var(--glass);border:1px solid var(--glass-b);
   backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);transition:background-color 1.4s ease,border-color 1.4s ease}
 #sub{margin:0 8px;font-weight:600;font-size:17px;text-wrap:balance}
 .seg{display:flex;gap:5px;margin:12px 8px 16px;height:7px}
@@ -122,7 +125,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 @keyframes cola{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(4deg)}}
 @keyframes prr{0%,100%{opacity:.25}50%{opacity:.95}}
 .respira{transform-box:fill-box;transform-origin:50% 100%;animation:respira 4.4s ease-in-out infinite}
-.zz text{font-family:var(--display);font-weight:800;fill:#fff3d6;opacity:0;animation:zz 4.4s ease-in-out infinite}
+.zz text{font-family:var(--display);font-weight:800;fill:#fff;opacity:0;animation:zz 4.4s ease-in-out infinite}
 .zz text:nth-child(2){animation-delay:1.45s}.zz text:nth-child(3){animation-delay:2.9s}
 @keyframes parpadeo{0%,93%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.1)}}
 @keyframes ladea{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
@@ -137,9 +140,10 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 <body>
 <main>
   <div class="escena" id="escena">
-    <svg viewBox="0 0 400 500" aria-hidden="true">
+    <svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
       <defs>
-        <radialGradient id="vin" cx="50%" cy="45%" r="75%"><stop offset=".45" stop-color="#3a1604" stop-opacity="0"/><stop offset="1" stop-color="#3a1604" stop-opacity="1"/></radialGradient>
+        <radialGradient id="vin" cx="50%" cy="45%" r="75%"><stop offset=".45" stop-color="#04071a" stop-opacity="0"/><stop offset="1" stop-color="#04071a" stop-opacity="1"/></radialGradient>
+        <radialGradient id="lamp"><stop offset="0" stop-color="#ffb060" stop-opacity=".75"/><stop offset="1" stop-color="#ffb060" stop-opacity="0"/></radialGradient>
         <pattern id="pana" width="9" height="9" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="3" height="9" style="fill:var(--pana)" opacity=".55"/></pattern>
       </defs>
       <rect width="400" height="500" style="fill:var(--wall)"/>
@@ -155,7 +159,6 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
       </g>
       <rect x="0" y="0" width="58" height="500" style="fill:var(--cortina)"/>
       <g style="stroke:var(--pliegue)" stroke-width="3" fill="none" stroke-linecap="round"><path d="M13 0 C9 170 17 340 11 500"/><path d="M32 0 C38 180 28 340 34 500"/><path d="M50 0 C46 160 54 330 48 500"/></g>
-      <text id="grande" x="212" y="118" text-anchor="middle" font-size="84">···</text>
       <g transform="translate(0,60)">
         <rect x="296" y="232" width="92" height="8" rx="4" style="fill:var(--madera)"/>
         <path d="M330 232 L334 206 L358 206 L362 232 Z" fill="#efe6d6"/>
@@ -233,11 +236,16 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
           <g class="zz"><text x="300" y="214" font-size="22">z</text><text x="322" y="184" font-size="28">z</text><text x="348" y="150" font-size="36">z</text></g>
         </g>
       </g>
+      <rect width="400" height="500" fill="#2a3c8c" style="opacity:var(--noche);mix-blend-mode:multiply" pointer-events="none"/>
+      <ellipse cx="200" cy="392" rx="230" ry="190" fill="url(#lamp)" style="opacity:var(--noche);mix-blend-mode:screen" pointer-events="none"/>
       <rect width="400" height="500" fill="url(#vin)" style="opacity:var(--vin)" pointer-events="none"/>
+      <g fill="#fff" style="opacity:var(--noche)"><circle cx="92" cy="40" r="1.6"/><circle cx="330" cy="30" r="1.3"/><circle cx="372" cy="150" r="1.4"/><circle cx="86" cy="170" r="1.2"/></g>
+      <text id="grande" x="206" y="118" text-anchor="middle" font-size="84">···</text>
     </svg>
     <span class="chip" id="fecha"></span>
   </div>
 
+  <div class="scroll" id="scroll">
   <section class="hoja" aria-live="polite">
     <p id="sub">Un momento.</p>
     <div class="seg" id="seg" aria-hidden="true"></div>
@@ -253,6 +261,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
     <ul class="detalle" id="detalle" hidden></ul>
   </section>
   <p class="pie" id="pie" hidden><button type="button" id="desconectar">Desconectar el calendario de este móvil</button></p>
+  </div>
 </main>
 
 <div class="barra">
@@ -468,7 +477,10 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
   var SOLO=!(window.claude&&window.claude.use);
   var API=null, apiPend=false, apiTimer=null, apiBusy=false;
   var RE=/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/;
+  var BASE="https://script.google.com/macros/s/";
   try{API=localStorage.getItem("gato-api")||null; apiPend=localStorage.getItem("gato-pend")==="1";}catch(e){}
+  try{var kq=new URLSearchParams(location.search).get("k"); if(kq&&/^[\w-]{20,}$/.test(kq)){API=BASE+kq+"/exec"; try{localStorage.setItem("gato-api",API)}catch(e){}}}catch(e){}
+  function ponerK(u){try{var id=u?u.slice(BASE.length,-5):""; history.replaceState(null,"",location.pathname+(id?"?k="+id:""))}catch(e){}}
   if(!SOLO) API=null;
   function setPend(v){apiPend=v; try{localStorage.setItem("gato-pend",v?"1":"0")}catch(e){}}
   function leerApi(url){return fetch(url+"?from="+today+"&days=14").then(function(r){return r.json()}).then(function(j){if(!j||!j.ok) throw new Error("x"); return j})}
@@ -499,12 +511,12 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
       var u=i.value.trim();
       if(!RE.test(u)){m.textContent="Ese enlace no parece el del script. Tiene que empezar por https://script.google.com/macros/s/ y acabar en /exec.";return}
       b.disabled=true; m.textContent="Probando…";
-      leerApi(u).then(function(j){API=u; try{localStorage.setItem("gato-api",u)}catch(e){} $("pie").hidden=false; aplicarApi(j); if(S.manual.length||Object.keys(S.cal).length) apiSave();},
+      leerApi(u).then(function(j){API=u; try{localStorage.setItem("gato-api",u)}catch(e){} $("pie").hidden=false; ponerK(u); aplicarApi(j); if(S.manual.length||Object.keys(S.cal).length) apiSave();},
         function(){b.disabled=false; m.textContent="El enlace no responde. Revisa que en la implementación el acceso sea «Cualquier usuario».";});
     });
     p.appendChild(i); p.appendChild(b); p.appendChild(m); box.appendChild(p);
   }
-  $("desconectar").addEventListener("click",function(){API=null; try{localStorage.removeItem("gato-api");localStorage.removeItem("gato-ev")}catch(e){} E=[]; calError=null; $("pie").hidden=true; render();});
+  $("desconectar").addEventListener("click",function(){API=null; try{localStorage.removeItem("gato-api");localStorage.removeItem("gato-ev")}catch(e){} ponerK(null); E=[]; calError=null; $("pie").hidden=true; render();});
 
   // --- ronroneo al tocar al gato
   var actx=null;
@@ -527,7 +539,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
   if(SOLO){
     mcp=false;
     if(API){
-      $("pie").hidden=false;
+      $("pie").hidden=false; ponerK(API);
       try{var c=JSON.parse(localStorage.getItem("gato-ev")||"null"); if(c&&c.d===today&&Array.isArray(c.e)) E=c.e;}catch(e){}
       render(); if(apiPend) apiSave(); apiLoad();
     } else { E=[]; render(); }

@@ -1,8 +1,6 @@
 {
  "name": "El gato en el sofá",
  "short_name": "Gato",
- "start_url": "./",
- "scope": "./",
  "display": "standalone",
  "background_color": "#e6d8bf",
  "theme_color": "#e6d8bf",
