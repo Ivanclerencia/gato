@@ -2,13 +2,14 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>El gato en el sofá</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="https://d8j0ntlcm91z4.cloudfront.net/user_32LJ8f9E5MwlOKpFunJdszlaVTp/hf_20261124_221534_30ca6fef-f6a7-4024-b831-10486ee6d488.png">
 <link rel="icon" href="https://d8j0ntlcm91z4.cloudfront.net/user_32LJ8f9E5MwlOKpFunJdszlaVTp/hf_20261124_221534_30ca6fef-f6a7-4024-b831-10486ee6d488.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gato">
 <meta name="theme-color" content="#efeeea">
 <meta name="robots" content="noindex,nofollow">
@@ -39,7 +40,9 @@ body{background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:
   transition:background-color 1.2s ease,color 1.2s ease;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 main{max-width:440px;margin:0 auto;height:100%;display:flex;flex-direction:column;position:relative}
 
-.barra{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:10px 12px 0}
+/* en el iPhone la app llega hasta arriba del todo; lo de dentro respeta la zona de la cámara y la barra inferior */
+.barra{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 0}
+.velo{position:absolute;top:0;left:0;right:0;height:calc(env(safe-area-inset-top,0px)*1.35);background:linear-gradient(rgba(0,0,0,.36),rgba(0,0,0,0));z-index:4;pointer-events:none}
 .icono{width:44px;height:44px;border:0;background:transparent;color:inherit;cursor:pointer;display:grid;place-items:center;padding:0;border-radius:8px}
 .icono svg{display:block}
 #fecha{font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding-right:6px}
@@ -64,11 +67,11 @@ main[data-vista="hoy"] .barra{color:#17150f}
 .escena>svg{display:block;width:100%;height:100%}
 .escena>svg *{transition:fill 1.2s ease,stroke 1.2s ease,opacity 1.2s ease}
 main:not([data-vista="hoy"]) .escena,main.teclado .escena{display:none}
-main.teclado .panel{padding-top:54px;border-top:0}
-main:not([data-vista="hoy"]) .panel{padding-top:54px;border-top:0}
+main.teclado .panel{padding-bottom:14px;padding-top:calc(54px + env(safe-area-inset-top,0px));border-top:0}
+main:not([data-vista="hoy"]) .panel{padding-top:calc(54px + env(safe-area-inset-top,0px));border-top:0}
 
 .panel{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--paper);border-top:1px solid var(--line);
-  padding:18px 16px 14px;transition:background-color 1.2s ease,border-color 1.2s ease}
+  padding:18px 16px calc(14px + env(safe-area-inset-bottom,0px));transition:background-color 1.2s ease,border-color 1.2s ease}
 .cab{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 12px;flex:none}
 h1{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1.05;letter-spacing:-.03em;margin:0;white-space:nowrap}
 #cuenta{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -105,7 +108,7 @@ h1{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1.05;lett
 .toast .lnk{color:var(--paper);font-weight:600}
 .elige{position:absolute;inset:0;z-index:9;background:rgba(0,0,0,.38);display:flex;align-items:flex-end}
 .elige[hidden]{display:none}
-.elige .caja2{width:100%;background:var(--paper);border-radius:14px 14px 0 0;padding:18px 16px 22px;display:flex;flex-direction:column;gap:8px}
+.elige .caja2{width:100%;background:var(--paper);border-radius:14px 14px 0 0;padding:18px 16px calc(22px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px}
 .elige p{margin:0 0 6px;font-weight:600;overflow-wrap:anywhere}
 .elige .op{height:50px;border-radius:8px;border:0;background:var(--row);color:var(--ink);font:inherit;font-weight:500;text-align:left;padding:0 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .elige select{height:36px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-size:16px;padding:0 6px}
@@ -128,7 +131,7 @@ h1{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1.05;lett
 button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 #avisoGuardado{margin:8px 0 0}
 
-.menu{position:absolute;inset:0;z-index:10;background:var(--paper);display:flex;flex-direction:column;padding:10px 12px 20px}
+.menu{position:absolute;inset:0;z-index:10;background:var(--paper);display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(20px + env(safe-area-inset-bottom,0px))}
 .menu[hidden]{display:none}
 .menu nav{flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 12px}
 .menu nav button small{font-size:13px;font-weight:500;letter-spacing:0;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -163,6 +166,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 </head>
 <body>
 <main id="app" data-vista="hoy">
+  <div class="velo" aria-hidden="true"></div>
   <div class="barra">
     <button class="icono" id="abrirMenu" type="button" aria-label="Abrir menú">
       <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 7h16M3 15h16"/></svg>
